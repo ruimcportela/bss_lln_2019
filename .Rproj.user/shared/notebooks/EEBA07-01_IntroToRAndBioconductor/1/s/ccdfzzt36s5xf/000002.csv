@@ -1,0 +1,2 @@
+"0","tbl <- gather(data, ""Gene"", ""Count"", -(1:3))"
+"0","tbl"

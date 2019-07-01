@@ -1,0 +1,16 @@
+"0","pdata <- read_csv(pdata_file)"
+"2","Parsed with column specification:
+cols(
+  .default = col_character(),
+  age = [32mcol_double()[39m,
+  `t(4;11)` = [33mcol_logical()[39m,
+  `t(9;22)` = [33mcol_logical()[39m,
+  cyto.normal = [33mcol_logical()[39m,
+  ccr = [33mcol_logical()[39m,
+  relapse = [33mcol_logical()[39m,
+  transplant = [33mcol_logical()[39m
+)
+"
+"2","See spec(...) for full column specifications.
+"
+"0","pdata"

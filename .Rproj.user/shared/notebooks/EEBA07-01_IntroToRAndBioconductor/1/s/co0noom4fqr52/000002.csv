@@ -1,0 +1,6 @@
+"0","pdata %>%"
+"0","    group_by(sex) %>%"
+"0","    summarize("
+"0","        n = n(),"
+"0","        ave_age = mean(age, na.rm = TRUE)"
+"0","    )"

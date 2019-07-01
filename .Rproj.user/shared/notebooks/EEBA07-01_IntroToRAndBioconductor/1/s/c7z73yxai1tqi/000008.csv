@@ -1,0 +1,4 @@
+"0","pdata %>% summarize("
+"0","    n = n(),"
+"0","    ave_age = mean(age, na.rm=TRUE)"
+"0",")"

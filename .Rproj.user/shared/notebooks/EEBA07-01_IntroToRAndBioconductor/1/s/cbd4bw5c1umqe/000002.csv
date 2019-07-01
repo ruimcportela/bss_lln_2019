@@ -1,0 +1,11 @@
+"0","counts <- read_csv(count_file)"
+"2","Parsed with column specification:
+cols(
+  .default = col_double(),
+  Run = [31mcol_character()[39m
+)
+"
+"2","See spec(...) for full column specifications.
+"
+"0","eg <- counts[, 1:6]    # make it easy to work with"
+"0","eg"

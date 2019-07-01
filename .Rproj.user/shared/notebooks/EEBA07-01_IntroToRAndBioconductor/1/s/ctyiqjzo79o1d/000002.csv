@@ -1,0 +1,8 @@
+"0","gene_summaries <-"
+"0","    data_tbl %>%"
+"0","    group_by(Gene) %>%"
+"0","    summarize("
+"0","        ave_count = mean(Count),"
+"0","        ave_log_count = mean(log(1 + Count))"
+"0","    )"
+"0","gene_summaries"

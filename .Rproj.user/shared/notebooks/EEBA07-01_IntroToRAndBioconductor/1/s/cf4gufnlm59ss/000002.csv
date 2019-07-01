@@ -1,0 +1,5 @@
+"0","counts_tbl <- gather(counts, ""Gene"", ""Count"", -Run)"
+"0","data_tbl <- left_join(pdata, counts_tbl)"
+"2","Joining, by = ""Run""
+"
+"0","data_tbl"

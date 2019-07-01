@@ -1,0 +1,2 @@
+"0","ggplot(gene_summaries, aes(ave_log_count)) +"
+"0","    geom_density()"

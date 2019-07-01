@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1561967250506.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3222608381",
+    "id" : "4151B2C3",
+    "lastKnownWriteTime" : 1561967957,
+    "last_content_update" : 1561967957217,
+    "path" : "C:/Paul/Local_Projects/Other_Projects/Bioinformatics School/Code/01_IntroToRAndBioconductor.Rmd",
+    "project_path" : "Code/01_IntroToRAndBioconductor.Rmd",
+    "properties" : {
+        "cursorPosition" : "127,45",
+        "scrollLine" : "113"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

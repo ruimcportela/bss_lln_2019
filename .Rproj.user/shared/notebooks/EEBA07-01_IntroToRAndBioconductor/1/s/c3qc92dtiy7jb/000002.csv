@@ -1,0 +1,17 @@
+"0","pdata <- read_csv(pdata_file)"
+"2","Parsed with column specification:
+cols(
+  SampleName = [31mcol_character()[39m,
+  cell = [31mcol_character()[39m,
+  dex = [31mcol_character()[39m,
+  albut = [31mcol_character()[39m,
+  Run = [31mcol_character()[39m,
+  avgLength = [32mcol_double()[39m,
+  Experiment = [31mcol_character()[39m,
+  Sample = [31mcol_character()[39m,
+  BioSample = [31mcol_character()[39m
+)
+"
+"0","pdata <- "
+"0","    pdata %>% "
+"0","    select(Run, cell, dex)"

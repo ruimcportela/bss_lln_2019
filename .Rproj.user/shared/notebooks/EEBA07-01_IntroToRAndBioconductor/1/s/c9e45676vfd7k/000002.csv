@@ -1,0 +1,4 @@
+"0","pdata_file <- "
+"0","    system.file(package=""BiocIntro"", ""extdata"", ""airway-sample-sheet.csv"")"
+"0","count_file <- "
+"0","    system.file(package=""BiocIntro"", ""extdata"", ""airway-read-counts.csv"")"
