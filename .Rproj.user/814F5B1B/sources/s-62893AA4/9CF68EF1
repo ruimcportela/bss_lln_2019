@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1561959474668.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "9CF68EF1",
+    "lastKnownWriteTime" : 1561649495,
+    "last_content_update" : 1561649495,
+    "path" : "C:/Paul/Local_Projects/Other_Projects/Bioinformatics School/Code/installation.R",
+    "project_path" : "Code/installation.R",
+    "properties" : {
+        "cursorPosition" : "54,0",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
