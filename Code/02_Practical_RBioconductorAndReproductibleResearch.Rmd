@@ -617,9 +617,32 @@ of the DNA sequences in `dna`. The `letters` argument should be
 `"GC"`; `as.prob = TRUE` returns values between 0 and 1. The data is
 returned as a matrix with 1 column.
 
+```{r}
+gc<- letterFrequency(dna,letters="GC",as.prob = TRUE)
+```
+
+
 **Exercise** Plot the distribution of GC frequencies in the `dna`
 object using base graphics `hist()` and `plot(density())`, and using
 `ggplot()`.
+
+```{r}
+hist(gc)
+```
+```{r}
+plot(density(gc))
+```
+
+
+## A sidenote on GC content
+
+GC has 3 hydrogen bonds whereas AT only has 2, so GC is a stronger bond. 
+
+https://en.wikipedia.org/wiki/GC-content
+
+Often skewed GC content means (or large peaks of GC) has lower sequencing coverage. 
+
+
 
 ## Tidy _Bioconductor_?
 
@@ -638,7 +661,7 @@ down-stream manipulation
 ```{r}
 gc <- 
     dna %>%
-    letterFrequency("GC", as.prob = TRUE) %>%
+    letterFrequency("GC",as.prob = TRUE) %>%
     tibble::as_tibble()
 gc
 ```
@@ -660,11 +683,10 @@ and objects you've learned in this practical.
 Finish your markdown document with a fenced section that evaluates the
 `sessionInfo()` command.
 
-<pre>
-```&#123;r&#125;
+
+```{r}
 sessionInfo()
 ```
-</pre>
 
 Here are the packages used for this practical:
 
