@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Morgan, intro R
 
 
-`methods` lists all methods available for a given class:
+`methods` lists all methods available for a given class, but not simple functions:
 
 ```{r}
 methods(class = lm)
@@ -21,6 +21,18 @@ Getting specific help for a method call:
 ```{r, eval = FALSE}
 ?plot.lm
 ```
+
+Note that not all functions are shown e.g. abline, which is a pure function:
+
+```{r}
+abline
+```
+where e.g. `anova` is a generic that dispatches to various methods:
+```{r}
+anova
+```
+
+and methods is actually listing the generics that operate. 
  
 ## Bioconductor intro
 
@@ -40,5 +52,33 @@ Check available packages (not case sensitive for search):
 ```{r}
 library(BiocManager)
 BiocManager::available("readr")
+```
+
+
+## classes, methods etc
+
+
+
+```{r}
+class(anova); anova
+```
+
+anova is an S3 class (all things such as generic.method are S3)
+
+```{r}
+fit<- lm(mpg ~ cyl, cars)
+```
+
+
+```{r}
+getAnywhere(anova.lm)
+```
+```{r}
+library(Biostrings)
+?`reverseComplement,DNAStringSet-class`  
+```
+This structure is for S4:
+```{r}
+?`reverseComplement,DNAStringSet-method`
 ```
 

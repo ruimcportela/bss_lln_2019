@@ -438,19 +438,45 @@ dna
 **Exercise** Does the object `dna` support the operations illustrated
 above for a character vector, especially `length()`, `nchar()`, `[`,
 and `sample()`?
+```{r}
+class(dna)
+m_check<- methods(class = class(dna)) 
+m_check
+```
+
+Yes is does.
 
 **Exercise** Prove to yourself that at least some other useful,
 DNA-specific, functions exist, e.g., `reverse()` and
 `reverseComplement()`.
+```{r}
+reverse(dna)
+```
+
+```{r}
+reverseComplement(dna)
+```
+
 
 **Exercise** What happens when you try to create a `DNAStringSet()`
 from an object such as `my_sequence`, defined above, that does not
 contain a DNA sequence? Warning: the message is quite cryptic, can you
 provide a 'human' translation?
+```{r}
+my_sequence; DNAStringSet(my_sequence)
+```
+This is this statement that the character vector is not that of DNA.
 
 **Exercise** Why does `DNAStringSet("ACGTMRW")` not create an error,
 since `MRW` are not standard nucleotides? For hints, see the section
 'The DNA alphabet:" on the help page `?DNAString`.
+
+This alphabet contains all letters from the IUPAC Extended Genetic Alphabet (see ?IUPAC_CODE_MAP) plus "-" (the gap letter), "+" (the hard masking letter), and "." (the not a letter or not available letter). It is stored in the DNA_ALPHABET predefined constant (character vector). Note though that `D` abd `W` represents different kinds of ambiguity.
+
+```{r}
+alphabetFrequency(dna)
+```
+
 
 ## `methods()`, help, and `browseVignettes()`
 
@@ -469,6 +495,24 @@ an object of class `DNAStringSet` using `methods(class =
 "DNAStringSet")`. Verify that `reverseComplement` is among those
 methods.
 
+```{r}
+methods(class = DNAStringSet)
+```
+```{r}
+DNAStringSet
+```
+```{r}
+reverseComplement; showMethods(reverseComplement)
+```
+
+Getting information about S4 objects:
+
+
+```{r}
+getClassDef("DNAStringSet")
+```
+
+
 Help pages describing a particular method can be found using `?`, with
 the search query quoted and with tab-completion providing hints on
 what the appropriate help topic is.
@@ -477,6 +521,27 @@ what the appropriate help topic is.
 operating on a `DNAStringSet` object, using
 `?"reverseComplement,DNAStringSet-method"`.
 
+This structure indicates a S4 object:
+
+```{r}
+?`reverseComplement,DNAStringSet-method`
+```
+
+
+Note that this works:
+
+```{r}
+?`matchPattern,XStringSet-method`
+```
+
+but this doesn't:
+
+```{r}
+?`matchPattern,DNAStringSet-method`
+```
+
+
+
 Help pages provide a description of the technical details required for
 creating classes and using methods. Vignettes provide a more narrative
 description of overall package use.
@@ -484,6 +549,11 @@ description of overall package use.
 **Exercise** Use `browseVignettes(package = "Biostrings")` to see
 vignettes available for this package; explore a few vignettes to get a
 sense of possible content.
+
+```{r}
+browseVignettes(package = "Biostrings")
+```
+
 
 ## `readDNAStringSet()`
 
@@ -531,6 +601,14 @@ dna
 **Exercise** Query the object for basic properties, e.g., it's
 `length()` and that the number of characters in each sequence is 2000
 `unique(nchar(dna))`.
+
+```{r}
+length(dna); unique(nchar(dna))
+```
+```{r}
+length(nchar(dna))
+```
+
 
 ## `letterFrequency()`: calculate GC content
 
