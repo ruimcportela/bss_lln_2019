@@ -1,0 +1,26 @@
+---
+title: "Notes from Bioinformatics Summer School 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Day 1 
+
+## Morgan, intro R
+
+
+`methods` lists all methods available for a given class:
+
+```{r}
+methods(class = lm)
+```
+Getting specific help for a method call:
+```{r, eval = FALSE}
+?plot.lm
+```
+ 
+## Bioconductor intro
+
