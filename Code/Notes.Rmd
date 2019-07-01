@@ -1,5 +1,5 @@
 ---
-title: "Notes from Bioinformatics Summer School 2019"
+title: "Other notes from Bioinformatics Summer School 2019"
 output: html_document
 ---
 
@@ -23,4 +23,15 @@ Getting specific help for a method call:
 ```
  
 ## Bioconductor intro
+
+`nchar` counts the number of characters in each entry of character vector:
+
+```{r}
+seq = c("AAACA", "CATGC")
+nchar(seq)
+```
+
+```{r}
+"DNAStringSet"
+```
 

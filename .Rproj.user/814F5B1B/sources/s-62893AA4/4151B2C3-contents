@@ -260,9 +260,36 @@ library(Biostrings)
 
 ```{r}
 seq = c("AAACA", "CATGC")
+nchar(seq)
 dna <- DNAStringSet(seq)
 reverseComplement(dna)
 ```
+
+`?reverseComplement:` If x is a DNAString or RNAString object, complement(x) returns an object where each base in x is "complemented" i.e. A, C, G, T in a DNAString object are replaced by T, G, C, A respectively and A, C, G, U in a RNAString object are replaced by U, G, C, A respectively.
+
+Letters belonging to the IUPAC Extended Genetic Alphabet are also replaced by their complement (M <-> K, R <-> Y, S <-> S, V <-> B, W <-> W, H <-> D, N <-> N) and the gap ("-") and hard masking ("+") letters are unchanged.
+
+`DNAStringSet` also checks that the letters are actually nucleotides:
+
+```{r}
+seq2 = c("AAACA", "ECATGC")
+nchar(seq2)
+dna2 <- DNAStringSet(seq2)
+```
+
+Note though that `D` abd `W` represents different kinds of ambiguity: 
+
+```{r}
+seq2 = c("AAACA", "ECATGCDW")
+nchar(seq2)
+dna2 <- DNAStringSet(seq2)
+```
+We can check the alphabet:
+
+```{r}
+DNA_ALPHABET
+```
+This alphabet contains all letters from the IUPAC Extended Genetic Alphabet (see ?IUPAC_CODE_MAP) plus "-" (the gap letter), "+" (the hard masking letter), and "." (the not a letter or not available letter). It is stored in the DNA_ALPHABET predefined constant (character vector).
 
 ```{r}
 dm3_upstream_file <-
@@ -270,15 +297,24 @@ dm3_upstream_file <-
 readLines(dm3_upstream_file, 10)
 ```
 
+`readLines:` Base R to read some or all text lines from a connection.
+
 ```{r}
 dna <- readDNAStringSet(dm3_upstream_file)
 dna
 ```
 
+We should understand this as being 26454 genes, each of width 2000 with their names listed. We can count the content of certain letters in each sequence: 
+
 ```{r}
 gc <- letterFrequency(dna, "GC", as.prob = TRUE)
 hist(gc)
 ```
+
+```{r}
+dna [gc > .5]
+```
+
 
 ```{r, message = FALSE}
 library(BSgenome)

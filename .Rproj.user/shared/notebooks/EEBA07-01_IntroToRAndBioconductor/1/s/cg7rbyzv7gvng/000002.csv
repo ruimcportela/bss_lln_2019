@@ -1,2 +1,0 @@
-"0","gc <- letterFrequency(dna, ""GC"", as.prob = TRUE)"
-"0","hist(gc)"

@@ -5,15 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "0",
+    "hash" : "2756349130",
     "id" : "4151B2C3",
-    "lastKnownWriteTime" : 1561967957,
-    "last_content_update" : 1561967957217,
+    "lastKnownWriteTime" : 1561977177,
+    "last_content_update" : 1561977179108,
     "path" : "C:/Paul/Local_Projects/Other_Projects/Bioinformatics School/Code/01_IntroToRAndBioconductor.Rmd",
     "project_path" : "Code/01_IntroToRAndBioconductor.Rmd",
     "properties" : {
-        "cursorPosition" : "127,45",
-        "scrollLine" : "113"
+        "cursorPosition" : "315,0",
+        "scrollLine" : "312"
     },
     "read_only" : false,
     "read_only_alternatives" : [
