@@ -69,6 +69,7 @@ session.
 ```{r, message = FALSE}
 library(readr)
 library(dplyr)
+library(BiocStyle)
 ```
 
 If _R_ responds 
@@ -154,14 +155,14 @@ Press the 'Knit' button, debugging any errors that occur.
 Create a code chunk containing instructions for data input, using a
 'fence' followed by `{r}`
 
-<pre>
-```&#123;r&#125;
+
+```{r}
 library(readr)
-pdata_file = "path/to/file"
-pdata <- readr(pdata_file)
+pdata_file = pdata_file
+pdata <- read_csv(pdata_file)
 pdata
 ```
-</pre>
+
 
 Press the 'Knit' button. Note that the code is actually evaluated, and
 when correct will import the data from the `pdata_file`.
@@ -194,6 +195,12 @@ pdata %>% arrange(desc(age))
 **Exercise** How would you use `arrange()` to order the samples from
 youngest to oldest, with individuals of equal `age` ordered by `sex`?
 
+```{r}
+pdata %>% arrange(age,sex) 
+
+```
+
+
 ## `summarize()` and `group_by()`
 
 Let's ask the average age of males and females. First, use
@@ -220,13 +227,29 @@ pdata %>% group_by(sex) %>% summarize(n = n())
 **Exercise** What is the `NA` sex? Use `filter()` to identify the 3
 records with `is.na(sex)`.
 
+```{r}
+pdata %>% filter(is.na(sex))
+```
+
+
 **Exercise** Use `arrange()` and `desc()` to arrange the summary table
 from most to least frequent.
-   
+
+```{r}
+pdata %>% group_by(sex) %>% summarize(n = n()) %>% arrange(desc(n))
+```
+
+
 **Exercise** Add another column `ave_age` to `summarize()`, using
 `mean()` to calculate the average age by sex. You'll need to use the
 `na.rm = TRUE` argument to calculate an average age in the face of
 missing values.
+
+```{r}
+pdata %>% group_by(sex) %>% summarize(n = n(),mean_age=mean(age, na.rm = TRUE))
+```
+
+
 
 ## `t.test()`, an untidy function
 

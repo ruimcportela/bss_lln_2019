@@ -35,3 +35,10 @@ nchar(seq)
 "DNAStringSet"
 ```
 
+Check available packages (not case sensitive for search):
+
+```{r}
+library(BiocManager)
+BiocManager::available("readr")
+```
+
