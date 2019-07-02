@@ -5,11 +5,16 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
 ```
 
 # Day 1 
 
 ## Morgan, intro R
+
+```{r}
+getwd()
+```
 
 
 `methods` lists all methods available for a given class, but not simple functions:
@@ -66,7 +71,8 @@ class(anova); anova
 anova is an S3 class (all things such as generic.method are S3)
 
 ```{r}
-fit<- lm(mpg ~ cyl, cars)
+fit<- lm(Sepal.Length~Sepal.Width , iris)
+anova
 ```
 
 
@@ -82,3 +88,119 @@ This structure is for S4:
 ?`reverseComplement,DNAStringSet-method`
 ```
 
+
+# Day 2 
+
+## Bioconductor core technologies - Morgan
+
+### Genomic ranges
+
+Map reads to known ranges in reference genome, identify gene and then determine expression by couting the number of matches. 
+
+Variants have known genomic coordinates too i.e. a genomic range. Example question: Do they affect expression? First match to gene, then locate it in genome and identify what it may do. 
+
+```{r}
+library(GenomicRanges)
+exon = GRanges(c("chr1:20-30:+","chr1:40-50:+","chr1:45-55:+"))
+exon
+```
+Recall, most protein-coding genes in eukaryotic cells are composed
+of a number of coding regions (exons) interspersed with
+noncoding regions (introns) 
+
+(see [Documentation/BioInformatic/0.0_DNA_and_the_flow_of_genetic_information_2015.pdf])
+
+```{r}
+start(exon)
+```
+```{r}
+end(exon)
+```
+```{r}
+width(exon)
+```
+Note there are different ways to count: half-open or closed. Representation assumes it is closed intervals.
+```{r}
+snp<- GRanges(c("chr:12345","chr:23456"))
+```
+
+There is a shift operator
+```{r}
+shift(snp,1)
+```
+
+and flank:
+```{r}
+flank(snp,10)
+```
+```{r}
+reduce(exon)
+```
+
+```{r}
+disjoin(exon)
+```
+```{r}
+snp<-GRanges(c("chr1:25","chr1:35","chr1:48"))
+snp
+```
+
+```{r}
+exon
+```
+The following does the obvious count: how many times the snips overlap each exon
+
+```{r}
+countOverlaps(snp,exon)
+```
+
+```{r}
+countOverlaps(exon,snp)
+```
+
+again doing the obvious: not symmetric. 
+
+
+```{r}
+snp %over% exon
+```
+```{r}
+snp[snp %over% exon]
+```
+```{r}
+cvg<- coverage(exon)
+cvg
+```
+We read this as follows: "Start a position 1 there are 19 zeros, then then are 11 with 1 exon, then 9 zeros, then 5 1s, 6 2s etc." 
+
+You can also coerce this back to a GRanges object:
+
+```{r}
+(grcvg<- cvg %>% as("GRanges"))
+```
+
+but you lose the strange information.
+
+You can pull out the metadata, which is on the rhs of the | in the GRanges object. 
+
+```{r}
+mcols(grcvg)
+```
+
+Note that this is a different kind of object: a DataFrame (capital D).
+
+```{r}
+library(Biostrings)
+df<- DataFrame(
+  i=1:3,
+  dna = DNAStringSet(c("AAA","CCC","GGG")),
+  gr = exon
+  
+  
+)
+df
+```
+
+## Data visualisation
+
+[Modern Statistics for Modern Biology, by Susan Holmes, Wolfgang Huber](http://web.stanford.edu/class/bios221/book/)
