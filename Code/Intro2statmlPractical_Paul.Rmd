@@ -1,0 +1,834 @@
+---
+title: "Introduction to Statistics and Machine Learning"
+date: "27 June 2019"
+author:
+- name: Oliver M. Crook. Work; PS
+  affiliation: MRC Biostatistics Unit, Cambridge, UK
+abstract: >
+ This practical gives a hands on introduction to many of 
+ the statistical and machine learning tools used
+ by bioinformaticians. It serves as an introduction
+ and many more advanced topics are omitted. Correction
+ of mistakes and typos is appreciated.
+output:
+  BiocStyle::html_document:
+   toc_float: true
+---
+
+Many of these example have been taken and adapted from 
+
+Modern Statistics for Modern Biology; Susan Holmes and Wolfgang Huber
+
+An Introduction to Statistical Learning; James, Witten, Hastie, Tibshirnani
+
+The Elements to Statistical Learning; Friedman, Tibshirani, Hastie
+
+# Testing
+
+## Is my coin biased?
+
+The following code chunk simulates 100 coin toss from a biased coin.
+
+```{r,}
+set.seed(2) # sets a random seed
+numFlips = 100
+probHead = 0.59
+coinFlips = sample(c("H", "T"), size = numFlips,
+  replace = TRUE, prob = c(probHead, 1 - probHead))
+head(coinFlips)
+
+```
+If the coin were unbiased we expect roughly 50 heads. Let us see how many heads and tails there are.
+```{r,}
+table(coinFlips)
+```
+
+We calculate the binomial statistic for a number of flips between 0 and 100. This is the binomial density
+for an unbiased coin.
+```{r,}
+library("dplyr")
+k = 0:numFlips
+numHeads = sum(coinFlips == "H")
+binomDensity = tibble(k = k, p = dbinom(k, size = numFlips, prob = 0.5))
+```
+
+```{r}
+library(ggplot2)
+binomDensity %>% dplyr::select(p) %>%  ggplot(aes(p)) +
+  geom_density() +
+  theme_bw()
+```
+
+
+Questions: 
+
+1) Write some code to check that the probabilties from the binomial statistic sum to $1$.
+```{r}
+sum(binomDensity$p)
+```
+
+
+2) Change the `prob` argument and show that the probabilities still sum to $1$.
+
+```{r}
+sum(dbinom(k, size = numFlips, prob = 0.05))
+```
+
+
+
+The following code chunk plots the binomial statistic and the number of heads observed is marked in blue.
+
+```{r,}
+library("ggplot2")
+ggplot(binomDensity) +
+  geom_bar(aes(x = k, y = p), stat = "identity") +
+  geom_vline(xintercept = numHeads, col = "blue")
+
+```
+
+Question:
+
+3) Change the prob argument above and re-plot the binomial statistic, what do you notice about how the distribution is centered?
+```{r}
+binomDensity_05 = tibble(k = k, p = dbinom(k, size = numFlips, prob = 0.05))
+ggplot(binomDensity_05) +
+  geom_bar(aes(x = k, y = p), stat = "identity") +
+  geom_vline(xintercept = numHeads, col = "blue")
+
+```
+
+
+
+
+Now, we set the size of the reject threshold, this is a choice and corresponds to how many false discoveries we are
+happy to allow.
+```{r,}
+alpha = 0.05
+```
+
+Question:
+
+4) Without looking below use the arrange function from `dplyr` to order the probabilities, smallest first.
+
+```{r}
+binomDensity %>% arrange(p) 
+```
+
+
+5) Looking at the output, what is the most unlikely number of heads to observe?
+
+6) Looking at the output, what is the most likely number of heads to observe?
+
+
+
+Solution:
+<details>
+```{r,}
+orderBinomDenisty <- arrange(binomDensity, p)
+orderBinomDenisty[1,] # most unlikely
+orderBinomDenisty[101,] 
+```
+</details>
+
+
+Question:
+
+7) What does the following code chunk do?
+
+```{r,}
+binomDensity =  arrange(binomDensity, p) %>%
+        mutate(reject = (cumsum(p) <= alpha))
+binomDensity
+
+```
+
+It creates a new column to flag the lines that lie under the alpha with a cumulative sum i.e. summing up from smallest to largest probabilities, flag the k's that have the cumsum under alpha.
+
+
+Let us plot the reject region in red
+```{r,}
+ggplot(binomDensity) +
+  geom_bar(aes(x = k, y = p, fill = reject), stat = "identity") +
+  scale_fill_manual(
+    values = c(`TRUE` = "red", `FALSE` = "darkgrey")) + theme_minimal() + 
+  geom_vline(xintercept = numHeads, col = "blue") +
+  theme(legend.position = "none")
+
+
+```
+
+Questions:
+
+8) Is there evidence that our coin is biased? Yes
+
+9) Change the size of the reject region to a smaller value, what is our conclusion now?
+```{r}
+alpha = 0.01
+binomDensity %>% arrange(p) %>%
+  mutate(reject = (cumsum(p) <= alpha)) %>%
+  ggplot() +
+  geom_bar(aes(x = k, y = p, fill = reject), stat = "identity") +
+  scale_fill_manual(values = c(`TRUE` = "red", `FALSE` = "darkgrey")) + theme_minimal() +
+  geom_vline(xintercept = numHeads, col = "blue") +
+  theme(legend.position = "none")
+
+```
+
+No longer sufficient evidence to reject the null hypothesis.
+
+The above test already has an easy to use funciton in R:
+```{r,}
+binom.test(x = numHeads, n = numFlips, p = 0.5)
+
+```
+Look at the 95% CI - it doesn't overlap 0.5: reject null. Now make the test more stringent: 99% CI
+
+
+```{r}
+binom.test(x = numHeads, n = numFlips, p = 0.5, conf.level = 0.99)
+
+```
+and we now see that the there is no longer sufficient evidence at 99% confidence level. 
+
+## The t-test
+
+The following is some plant growth data with 2 treatments. The alpha parameter below
+has nothing to do with the reject region before. It changes the see-throughness of the
+points to better visualise overlapping points. Have a go at changing it.
+
+```{r,}
+library("ggbeeswarm")
+data("PlantGrowth")
+ggplot(PlantGrowth, aes(y = weight, x = group, col = group, size = 4, alpha = 0.7)) +
+  geom_beeswarm() + theme(legend.position = "none") + theme_minimal()
+```
+
+Let us take a look at the PlantGrowth data
+```{r,}
+head(PlantGrowth)
+```
+
+Question: 
+
+10) Using a t-test, check to see whether the difference in means of the ctrl and treatment 1 are different
+
+
+Solution
+<details>
+```{r,}
+t.test(PlantGrowth$weight[PlantGrowth$group == "ctrl"], PlantGrowth$weight[PlantGrowth$group == "trt1"], var.equal = TRUE)
+```
+</details>
+
+Questions:
+
+11) What is the p-value?
+
+12) Check the degrees of freedom is correct from the formula?
+```{r}
+ftable(PlantGrowth$group)
+```
+
+
+13) How do the assumptions of the t-test match up with the data?
+
+14) Check the arguments of the t.test function? What happens if you change the equal variance assumption?
+
+You may find the following code useful.
+
+```{r,}
+tt = with(PlantGrowth,
+          t.test(weight[group =="ctrl"],
+                 weight[group =="trt2"],
+                 var.equal = TRUE))
+tt
+```
+
+### Optional: Permtutation test example
+We briefly talked about permutation tests in the lecture. Here is an example of a permutation
+test. We determine a null distribution of the statistic by random permutation of the group labels.
+
+```{r, cache = TRUE}
+abs_t_null = with(
+  dplyr::filter(PlantGrowth, group %in% c("ctrl", "trt2")),
+    replicate(10000,
+      abs(t.test(weight ~ sample(group))$statistic)))
+```
+
+`sample carries` out the shuffling, replicated 10000 times. 
+
+Question
+
+15) Why did we use the absolute value function (abs) in the above code?
+We only care if it falls on one side 
+
+```{r,}
+ggplot(tibble(`|t|` = abs_t_null), aes(x = `|t|`)) +
+  geom_histogram(binwidth = 0.1, boundary = 0) + theme_minimal() + 
+  geom_vline(xintercept = abs(tt$statistic), col = "red")
+```
+
+The following computes the p-value.
+
+```{r,}
+mean(abs(tt$statistic) <= abs_t_null)
+
+```
+Question
+
+16) Check by writing some code that this value is the same as the rank of the t statistic divided by the number of permutations.
+
+17) Compare the p-value with the one computed using the t-test
+
+
+# Linear Models
+
+This section discusses linear models. There are many different software packages to work with in R, we start with some simple examples.
+
+
+Load libraries require for this section.
+```{r,}
+library(MASS)
+library(ISLR)
+```
+We load the boston housing market dataset, which includes data on the house price
+values in different neighbourhoods in Boston
+
+```{r,}
+data(Boston) # use fix(Boston) to bring up a data editor 
+names(Boston)
+```
+In R, the formula syntax is the following `lm(y~x,data)`. The first part specifies 
+the formula of the model (an intercept is included by default) and then the variables
+to regress on. The second part tells the linear model which data to use.
+We create a simple linear model with the median values as a reponse
+and the percent of households with low socioeconomic status (lstat) as a predictor.
+
+```{r,}
+lm.fit <- lm(medv ~ lstat , data = Boston) # You need to tell R what data to use
+```
+
+The output can be looked at using the summary function. Note how t statistics, R^2 and F statistics,
+as well as p-values are all outputed automatically. This makes it very easy to apply all the theory
+we learnt in lectures.
+
+```{r,}
+summary(lm.fit)
+coef(lm.fit) # extract coefficients
+confint(lm.fit) # extract confidence intervals
+```
+
+```{r}
+Boston %>% ggplot(aes(x=lstat,y=medv)) + geom_point() +
+  geom_smooth(method='lm')
+```
+
+
+Question
+
+18) Take the coefficients and calculate the statistics manually (using code not paper!)
+
+```{r}
+coef(lm.fit)
+
+se_b1_sq= 1
+```
+
+
+We can predict for new values of `lstat`, along with confidence intervals using `predict`
+```{r,}
+predict(lm.fit ,data.frame(lstat=(c(5,10 ,15))), interval = "confidence")
+```
+
+Let us visualise the results of the linear modelling. What is happening?
+
+```{r,}
+plot(Boston$lstat, Boston$medv, pch = 19)
+abline (lm.fit ,lwd=3,col ="red")
+```
+
+Plotting the lm object results in diagnostic plots.
+
+```{r,}
+par(mfrow=c(2,2))
+plot(lm.fit)
+```
+
+## Multiple regression
+
+The synatax `lm(y~x1+x2+x3)` is used for multiple linear regression where we
+are regressing on predictors `x1`, `x2`, `x3` etc. The following example uses `lstat`
+and `age` to fit a model.
+
+```{r,}
+lm.fit <- lm(medv ~ lstat + age , data = Boston )
+summary(lm.fit)
+
+```
+
+Question
+
+19) Fit at least 5 different linear models using the above synatax? What do you find out?
+```{r}
+lm.fit <- lm(medv ~ lstat + dis , data = Boston )
+summary(lm.fit)
+```
+
+
+If we want to use all predictors in the data frame we just put a point, as follows.
+
+```{r,}
+lm.fit <- lm(medv~. , data = Boston)
+summary (lm.fit)
+```
+
+A minus sign can be use to indicate NOT to use that predictor (it does not do a negative
+transformation).
+```{r,}
+lm.fit <- lm(medv ~.-age, data = Boston)
+```
+
+## Iteraction terms
+
+The syntax to include interaction terms is the following `lstat*age`. The `*` automatically
+includes the terms `lstat` and `age` as predictors by default.
+
+```{r,}
+lm.iteract <- lm(medv ~ lstat * age ,data = Boston)
+summary(lm.iteract)
+
+```
+
+Question
+
+20) Is the iteraction term useful?
+
+21) What can you deduce from the output about these predictors?
+
+22) Look at other iteraction terms, what other predictors have significant interactions?
+
+## Non-linear transformations of the predictors
+
+Recall that linear models are *linear in the parameters*. We are allowed to perform
+non-linear transformation of the predictors as follows. The `I()` is used to preserve
+standard syntax in R.
+
+```{r,}
+lm.nl <- lm(medv ~ lstat + I(lstat^2), data = Boston)
+summary(lm.nl)
+```
+
+Question:
+
+21) Try some different transformations of the predictors.
+
+## Comparing a linear and non-linear model 
+
+```{r}
+lm.linear <-  lm(medv ~ lstat, data = Boston)
+lm.nl <- lm(medv ~ lstat + I(lstat^2), data = Boston)
+res.anova <- anova(lm.linear, lm.nl)
+res.anova
+```
+
+Model 1 represents the linear sub-model containing only one predictor,
+`lstat`, while Model 2 corresponds to the larger quadratic model that has two
+predictors, `lstat` and `lstat^2`. The anova() function performs a hypothesis
+test comparing the two models. The null hypothesis is that the two models
+fit the data equally well, and the alternative hypothesis is that the full
+model is superior. Here the `F-statistic` is 135 and the associated p-value is
+virtually zero. This provides very clear evidence that the model containing
+the predictors `lstat` and `lstat^2` is superior to the model that only
+contains the predictor `lstat`. This is not surprising, since earlier we saw
+evidence for non-linearity in the relationship between medv and lstat.
+
+
+```{r,}
+par(mfrow=c(2,2))
+plot(lm.nl)
+```
+
+## Using factors in a linear model
+
+In this section, we explore using factors in a model
+
+```{r,}
+data("Carseats")
+names(Carseats)
+```
+
+
+```{r,}
+lm.factor <- lm(Sales~. +Income*Advertising + Price*Age ,data = Carseats )
+summary(lm.factor)
+```
+Questions:
+
+22) Which iteractions are significant?
+
+23) Can you explain what the code above mean (write out the model on some paper)?
+
+24) Create some diagnostic plots and visualisations.
+
+25) Which variabes are factors?
+
+26) Create some more models with interaction terms.
+
+The `contrasts` function extracts the coding that was used for the factors.
+
+```{r,}
+contrasts(Carseats$ShelveLoc)
+```
+
+The package `limma` uses similar notation but uses more advanced techniques
+such as empirical Bayes to improve robustness. These are covered in further
+praticals.
+
+# Dimensionality Reduction
+
+## Principal Components Analysis
+
+We demonstrate principial components analysis using data from US states, which is available in base R.
+
+```{r,}
+states <- row.names(USArrests)
+states
+```
+
+```{r,}
+names(USArrests)
+```
+
+First, looking at the variable means shows that they have very different means.
+```{r,}
+colMeans(USArrests)
+```
+
+The same is true of the variance of the variables
+
+```{r,}
+apply(USArrests, 2, var)
+```
+
+We use the `prcomp` function to perform PCA. Scaling of the variances is performed by default.
+
+```{r,}
+pr.out <- prcomp(USArrests, scale = TRUE)
+```
+
+Let us carefully examine the output of PCA
+```{r,}
+names(pr.out)
+```
+
+Question:
+
+27) What are the center and scale variables in the output?
+
+The rotations output provides the princpal component (PC) loadings.
+
+```{r,}
+pr.out$rotation
+```
+
+Question:
+
+28) Why are there 4 PCs?
+
+The prcomp function does not require us to compute the scores manually 
+from the loadings. They are stored in `x`
+
+```{r,}
+head(pr.out$x)
+```
+
+Let us plot the first two PCs. We use the biplot function and the base plot function
+to demonstrate the differences.
+
+```{r, fig.width=5}
+biplot(pr.out, scale = 0)
+```
+
+```{r,}
+plot(pr.out$x, pch = 19, col = "blue")
+```
+
+
+Unfortunatly, biplot produces a square plot by default. This is, in general, incorrect - the aspect of the plot should be rectangular in proportion to the variances explained.
+
+The variance explained by each component is computed from the standard deviations
+
+```{r,}
+pr.var <- pr.out$sdev ^2
+barplot(pr.var, ylab = "Variance", xlab = "PC")
+```
+
+The proportion of variance explain can also be easily computed
+
+```{r,}
+pve <- pr.var/sum(pr.var)
+barplot(pve , xlab= "Principal Component", ylab = "Proportion of Variance Explained ", ylim = c(0, 1), col = "darkgreen")
+barplot(cumsum(pve), xlab="Principal Component ", ylab = "Cumulative Proportion of Variance Explained ", ylim = c(0, 1), col = "blue")
+```
+
+
+Questions:
+
+29) Use the `princomp` function to perform pca, carefully look at the difference (and defaults!)
+
+30) Using `prcomp` perform pca on the observations rather than the variables by transposing the data matrix.
+
+31) Produce a biplot of this data - what do you notice?
+
+## Correspondance Analysis
+
+We demonstrate correspondance Analysis using the Hair and eye colour dataset
+
+```{r,}
+maleEyeHair <- HairEyeColor[, , 1]
+maleEyeHair
+```
+
+Load the `ca` package
+```{r,}
+library(ca)
+```
+The following code chunk performs correspondance analysis.
+```{r,}
+ca.fit <- ca(maleEyeHair)
+```
+
+The followin produces the correspondance analysis plot
+```{r,}
+plot(ca.fit, mass = TRUE, contrib = "absolute", map = "rowgreen", arrows = c(FALSE, TRUE))
+```
+
+Questions:
+
+32) Change some of the choices above - what does each argument do?
+
+33) Repeat the ca for female eye colour.
+
+34) Perform a chi-squared test on the eye colour dataset. How does this match up with the visualisation 
+in the plot?
+
+# Classification
+
+## The k-nearest neighbours method
+
+We use the library `class` and the Smarket dataset. We make predictions on the stock market data by using data from 2001-2004 to then predict for the year 2005.
+
+```{r,}
+library(class)
+data("Smarket")
+```
+
+Create a vector that indicates the years before 2005.
+```{r,}
+train <- (Smarket$Year < 2005)
+```
+
+We use cbind, which is short for column bind to put Lag1 and Lag2 data together and split the data into a training and testing dataset. Note the ! mean not; that is, !train is the opposite of train.
+```{r,}
+train.X <- cbind(Smarket$Lag1 , Smarket$Lag2)[train, ]
+test.X <- cbind(Smarket$Lag1, Smarket$Lag2)[!train, ]
+train.Direction <- Smarket$Direction[train]
+Direction.2005 <- Smarket$Direction[!train]
+```
+
+The k-nearest neighbour algorithm doesn't need a two-stage model fitting process.
+By this we mean one to learn the parameters and one to predict. It just predicts. We shall try to
+predict whether the stock market goes up or down in 2005, at first using $1$ neighbour.
+
+```{r,}
+knn.pred <- knn(train.X, test.X, train.Direction , k = 1)
+table(knn.pred, Direction.2005)
+Direction.2005
+```
+We now compute how many predictions are correct
+```{r,}
+(43 + 83)/252
+```
+
+Questions:
+
+35) Repeat the above for different choice of k? What happens?
+
+36) (hard) Can you implement cross-validation to choose k?
+
+
+## Logistic Regression
+
+Next we try to predict the direction of the stock market using logistic regression.
+The syntax of a generalised linear model `glm()` is the same as for `lm`. However,
+we need to tell `R` which model to use. In the case of logistic regression, we
+need to specify a binomial family with logit link (hence the name logistic regression.)
+
+```{r,}
+glm.fit <- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data = Smarket, family = binomial(link = "logit") )
+summary(glm.fit)
+```
+
+Questions:
+
+37) Extract the coefficients, what do they tell you?
+
+38) Which coefficients seem most useful for prediction?
+
+39) Using the p-values make a prediction about how well the logistic regression model will predict?
+
+To make a prediction we can use the predict function in `R`. The method outputs
+the probability that the the answer is $1$. Using `contrasts` decided whether
+$1$ corresponds to up or down in the market.
+
+```{r,}
+glm.probs <- predict(glm.fit, type = "response")
+glm.probs[1:10]
+```
+
+To covert these probabilities to predictions we threshold at $0.5$.
+```{r,}
+glm.pred <- rep("Down" , 1250)
+glm.pred[glm.probs > 0.5] <- "Up"
+```
+
+To see how well the classification see whether the predictions correspond to 
+the true answers.
+
+```{r,}
+table(glm.pred, Smarket$Direction )
+```
+
+Question:
+
+40) As was done K-NN compute the accuracy of the method.
+
+41) How well does the answer match your prediction for 39)
+
+42) What does the subset argument do in the glm?
+
+43) Using subset, fit the model only on the training data and test only on the data not used for training.
+
+# Clustering
+
+## The K-means algorithm
+
+The `kmeans` function implements the kmeans method in `R`. We simulate some data
+for which we know there are two clusters and we apply kmeans to these data.
+
+```{r,}
+set.seed(2)
+x <- matrix(rnorm (50 * 2), ncol = 2)
+x[1:25, 1] <- x[1:25, 1] + 3
+x[1:25, 2] <- x[1:25, 2] - 4
+```
+
+We now apply the kmeans algorithm.
+
+```{r,}
+km.out <- kmeans(x, 2, nstart = 20)
+```
+
+We see that the clustering recovers the original simulation
+
+```{r,}
+km.out$cluster
+```
+
+The following plot visualises the data and clustering.
+```{r,}
+plot(x, col=(km.out$cluster +1), main="K-Means Clustering Results with K = 2", xlab="", ylab="", pch=20, cex=2)
+```
+
+Questions:
+
+44) Try kmeans with different values of k
+
+45) How does the within sum of squares change for different values of K?
+
+46) Apply kmeans to either your own dataset or a dataset in this workbook.
+
+
+## Hierarchical clustering
+
+The `hclust` function performs hierarchical clustering in R. An example is the 
+following, which uses complete linkage
+
+```{r,}
+hc.complete = hclust(dist(x), method = "complete")
+```
+
+Question:
+
+47) By changing the argument for method perform single and average linkage clustering
+
+The plot function allows you to view the dendrograms
+
+```{r,}
+plot(hc.complete, main="Complete Linkage ", xlab="", sub="", cex=.9)
+```
+
+Question:
+
+48) Plot the dendrograms for single and average linkage.
+
+49) What are the difference between the methods?
+
+To compute a clustering, we cut the tree. This is performed using the following code
+
+```{r,}
+cutree(hc.complete , 2)
+```
+
+Question:
+
+50) Cut the single and average linkage trees?
+
+51) What is the effect of changing the numb of groups?
+
+52) Test hierarchical clustering on your favourite dataset
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

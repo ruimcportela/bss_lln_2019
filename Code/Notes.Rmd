@@ -209,7 +209,9 @@ df
 
 # Day 3
 
-## Gene set enrichment analysis (with practical) 
+# Gene Set Enrichment Analysis
+
+### Approaches (with practical) 
 
 See [Kharti et al 2012 ](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002375)
 
@@ -228,25 +230,28 @@ All beign equal, long genes receive more reads than short genes. See [Young et a
 
 Aprroach 6: de novo discovery. Consider the previous as being supervised. Now try unsupervised. [Langfelder and Horvath](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559)
 
-## Benchmarks
+### Benchmarks
 
 Levi Waldron: [GSEABenchmarkeR](https://github.com/waldronlab/GSEABenchmarkeR) and the twitter description [here](https://twitter.com/LeviWaldron1/status/1142092301403115521)
 
-## Issues with single cell data
+### Issues with single cell data
 
 Dim reduction, therefore should analysis weightings? 
 
 
-## Slides wrap up
+### Slides wrap up
 
 [BiocView](https://www.bioconductor.org/packages/devel/BiocViews.html)
 
-## Rmd 6
+### Rmd 6
 
 Volcano plots - size v. stat significance 
 
 goana: does the relevant joins to get the gene sets from the entrez ids. 
 
 
+## Intro Stats and ML - Oliver Crook
+
+p-value histogram is very informative/ should be uniform, spikes at higher values suggest the wrong test, small slope upwards towards wero implies lower power.
 
 
