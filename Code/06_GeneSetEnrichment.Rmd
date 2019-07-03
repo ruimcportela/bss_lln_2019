@@ -123,7 +123,7 @@ plot(-log10(P.DE) ~N, go)
 ```
 
 
-Below bugs:
+Below bugs with dplyr::select being used
 
 ```{r}
 library(GO.db)
@@ -134,9 +134,14 @@ go <-
             GO.db, .$Term, "GOID", "TERM"
         ) %>% unname()
     ) %>%
-    select(GOID, everything()) %>% 
+    dplyr::select(GOID, everything()) %>% 
     arrange(P.DE)
 ```
+
+```{r}
+findFunction(select)
+```
+
 
 Sanity check
 

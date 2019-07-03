@@ -28,6 +28,7 @@ options(width = 75)
 
 ```{r, message = FALSE}
 library(SummarizedExperiment)
+library(dplyr)
 ```
 
 The [airway][] experiment data package summarizes an RNA-seq
@@ -47,12 +48,26 @@ object? What do the rows and columns correspond to in terms of the
 original experiment? Hint: use `dplyr::glimpse()` to look at the first
 few elements of each `dimnames`.
 
+```{r}
+print(dim(airway))
+dimnames(airway) %>% glimpse()
+```
+
+
 **Exercise** Use the functions `assay()`, `colData()`, `rowRanges()`
 to extract the three major components of the `airway` data
 set. `assay()` is large, so interogate it using `class()`, `dim()` and
 `head()` rather than simply printing it to the screen. What do each of
 these parts corresspond to in terms of the RNASeq experiment
 summarized in this object?
+
+```{r}
+assay(airway) %>% dim() %>% print()
+assay(airway) %>% class() %>% print()
+assay(airway) %>% head() %>% print()
+```
+
+
 
 ### The matrix-like behavior of `SummarizedExperiment`
 
