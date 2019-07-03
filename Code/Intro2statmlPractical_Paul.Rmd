@@ -329,10 +329,26 @@ Question
 18) Take the coefficients and calculate the statistics manually (using code not paper!)
 
 ```{r}
-coef(lm.fit)
+fit1<-lm(medv ~ lstat , data = Boston)
+(summary(fit1))
 
-se_b1_sq= 1
+#sanity check
+sum(fit1$residuals) # very close to 0: good. 
+
+x_mean = mean(Boston$lstat)
+xi=Boston$lstat
+n=length(Boston$lstat)
+var_epsilon = var(fit1$residuals)
+
+SE_b1 = sqrt(var_epsilon/sum((xi - x_mean)^2)) # looks good
+SE_b0 = sqrt(var_epsilon*((1/n) + x_mean^2/sum((xi - x_mean)^2))) # looks good
+
 ```
+
+```{r}
+
+```
+
 
 
 We can predict for new values of `lstat`, along with confidence intervals using `predict`
