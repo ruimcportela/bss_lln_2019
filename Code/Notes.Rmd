@@ -204,3 +204,49 @@ df
 ## Data visualisation
 
 [Modern Statistics for Modern Biology, by Susan Holmes, Wolfgang Huber](http://web.stanford.edu/class/bios221/book/)
+
+
+
+# Day 3
+
+## Gene set enrichment analysis (with practical) 
+
+See [Kharti et al 2012 ](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002375)
+
+A *gene set* is any a priori classification of 'genes' into biological relevant groups. 
+
+The gene ontology is a DAG. 
+
+Approach 3: no single gene is significantly different, but the entire pathway is over-expressed in one group. Test on aggregrate of single gene tests. Permutations. [Goemann and Buehlmann 2007](https://www.ncbi.nlm.nih.gov/pubmed/17303618).
+
+Approach 4: Linear model approach [Hummel et al 2008](https://academic.oup.com/bioinformatics/article/24/1/78/205159)
+
+The above appraoches were mainly developed on microarray data. The following were developed for sequence data. 
+
+Aprroach 5: issues
+All beign equal, long genes receive more reads than short genes. See [Young et al](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-2-r14). Normalise by gene length. 
+
+Aprroach 6: de novo discovery. Consider the previous as being supervised. Now try unsupervised. [Langfelder and Horvath](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559)
+
+## Benchmarks
+
+Levi Waldron: [GSEABenchmarkeR](https://github.com/waldronlab/GSEABenchmarkeR) and the twitter description [here](https://twitter.com/LeviWaldron1/status/1142092301403115521)
+
+## Issues with single cell data
+
+Dim reduction, therefore should analysis weightings? 
+
+
+## Slides wrap up
+
+[BiocView](https://www.bioconductor.org/packages/devel/BiocViews.html)
+
+## Rmd 6
+
+Volcano plots - size v. stat significance 
+
+goana: does the relevant joins to get the gene sets from the entrez ids. 
+
+
+
+
