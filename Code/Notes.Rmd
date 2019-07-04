@@ -344,3 +344,21 @@ TPM: transcript per million
 
 iSee: visualising SummarizedExperiment data: reproducible. 
 
+## Bulk RNA-seq analysis
+
+Different kinds of expression.
+
+Always give raw counts.
+
+### Challenges for RNA-seq data analysis- 
+
+#### Few samples -> difficult to estimate parameters. Shrinkage: 
+
+assume dispersion is the same for all the genes = Strong assumption. Shrinkage - assume that similarly expressed genes have similar disperson. Better estimate of dispersion of some genes.
+
+DEseq2: fit curve (parammetric or not); move dots towards regression line.
+
+#### Challenges for RNA-seq data analysis- High dimensionality (many genes) -> many tests
+
+Having the transcript abundancies allows for the average transcript length to be calculated. 
+
