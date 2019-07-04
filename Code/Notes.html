@@ -441,13 +441,13 @@ $(document).ready(function () {
 ##     int_abline(a = a, b = b, h = h, v = v, untf = untf, ...)
 ##     invisible()
 ## }
-## &lt;bytecode: 0x000000000c8f1400&gt;
+## &lt;bytecode: 0x000000000c929890&gt;
 ## &lt;environment: namespace:graphics&gt;</code></pre>
 <p>where e.g. <code>anova</code> is a generic that dispatches to various methods:</p>
 <pre class="r"><code>anova</code></pre>
 <pre><code>## function (object, ...) 
 ## UseMethod(&quot;anova&quot;)
-## &lt;bytecode: 0x000000000673d6c8&gt;
+## &lt;bytecode: 0x00000000061ed600&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <p>and methods is actually listing the generics that operate.</p>
 </div>
@@ -471,14 +471,14 @@ BiocManager::available(&quot;readr&quot;)</code></pre>
 <pre><code>## [1] &quot;function&quot;</code></pre>
 <pre><code>## function (object, ...) 
 ## UseMethod(&quot;anova&quot;)
-## &lt;bytecode: 0x000000000673d6c8&gt;
+## &lt;bytecode: 0x00000000061ed600&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <p>anova is an S3 class (all things such as generic.method are S3)</p>
 <pre class="r"><code>fit&lt;- lm(Sepal.Length~Sepal.Width , iris)
 anova</code></pre>
 <pre><code>## function (object, ...) 
 ## UseMethod(&quot;anova&quot;)
-## &lt;bytecode: 0x000000000673d6c8&gt;
+## &lt;bytecode: 0x00000000061ed600&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <pre class="r"><code>getAnywhere(anova.lm)</code></pre>
 <pre><code>## A single object matching &#39;anova.lm&#39; was found
@@ -528,7 +528,7 @@ anova</code></pre>
 ##         paste(&quot;Response:&quot;, deparse(formula(object)[[2L]]))), 
 ##         class = c(&quot;anova&quot;, &quot;data.frame&quot;))
 ## }
-## &lt;bytecode: 0x000000000badc310&gt;
+## &lt;bytecode: 0x000000000bb24a58&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <pre class="r"><code>library(Biostrings)</code></pre>
 <pre><code>## Loading required package: BiocGenerics</code></pre>
@@ -581,11 +581,8 @@ anova</code></pre>
 ## 
 ##     strsplit</code></pre>
 <pre class="r"><code>?`reverseComplement,DNAStringSet-class`  </code></pre>
-<pre><code>## No documentation for &#39;reverseComplement,DNAStringSet-class&#39; in specified packages and libraries:
-## you could try &#39;??reverseComplement,DNAStringSet-class&#39;</code></pre>
 <p>This structure is for S4:</p>
 <pre class="r"><code>?`reverseComplement,DNAStringSet-method`</code></pre>
-<pre><code>## starting httpd help server ... done</code></pre>
 </div>
 </div>
 <div id="day-2" class="section level1">
@@ -743,6 +740,87 @@ df</code></pre>
 <div id="data-visualisation" class="section level2">
 <h2>Data visualisation</h2>
 <p><a href="http://web.stanford.edu/class/bios221/book/">Modern Statistics for Modern Biology, by Susan Holmes, Wolfgang Huber</a></p>
+</div>
+</div>
+<div id="day-3" class="section level1">
+<h1>Day 3</h1>
+</div>
+<div id="gene-set-enrichment-analysis" class="section level1">
+<h1>Gene Set Enrichment Analysis</h1>
+<div id="approaches-with-practical" class="section level3">
+<h3>Approaches (with practical)</h3>
+<p>See <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002375">Kharti et al 2012</a></p>
+<p>A <em>gene set</em> is any a priori classification of ‘genes’ into biological relevant groups.</p>
+<p>The gene ontology is a DAG.</p>
+<p>Approach 3: no single gene is significantly different, but the entire pathway is over-expressed in one group. Test on aggregrate of single gene tests. Permutations. <a href="https://www.ncbi.nlm.nih.gov/pubmed/17303618">Goemann and Buehlmann 2007</a>.</p>
+<p>Approach 4: Linear model approach <a href="https://academic.oup.com/bioinformatics/article/24/1/78/205159">Hummel et al 2008</a></p>
+<p>The above appraoches were mainly developed on microarray data. The following were developed for sequence data.</p>
+<p>Aprroach 5: issues All beign equal, long genes receive more reads than short genes. See <a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-2-r14">Young et al</a>. Normalise by gene length.</p>
+<p>Aprroach 6: de novo discovery. Consider the previous as being supervised. Now try unsupervised. <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-559">Langfelder and Horvath</a></p>
+</div>
+<div id="benchmarks" class="section level3">
+<h3>Benchmarks</h3>
+<p>Levi Waldron: <a href="https://github.com/waldronlab/GSEABenchmarkeR">GSEABenchmarkeR</a> and the twitter description <a href="https://twitter.com/LeviWaldron1/status/1142092301403115521">here</a></p>
+</div>
+<div id="issues-with-single-cell-data" class="section level3">
+<h3>Issues with single cell data</h3>
+<p>Dim reduction, therefore should analysis weightings?</p>
+</div>
+<div id="slides-wrap-up" class="section level3">
+<h3>Slides wrap up</h3>
+<p><a href="https://www.bioconductor.org/packages/devel/BiocViews.html">BiocView</a></p>
+</div>
+<div id="rmd-6" class="section level3">
+<h3>Rmd 6</h3>
+<p>Volcano plots - size v. stat significance</p>
+<p>goana: does the relevant joins to get the gene sets from the entrez ids.</p>
+</div>
+<div id="intro-stats-and-ml---oliver-crook" class="section level2">
+<h2>Intro Stats and ML - Oliver Crook</h2>
+<p>p-value histogram is very informative/ should be uniform, spikes at higher values suggest the wrong test, small slope upwards towards wero implies lower power.</p>
+</div>
+</div>
+<div id="day-4" class="section level1">
+<h1>Day 4</h1>
+<div id="high-throughput-sequencing-data-processing-charlotte-sonenson" class="section level2">
+<h2>High-throughput sequencing data processing: Charlotte Sonenson</h2>
+<p>mRNA code for protein, need to remove ribosome RNA.</p>
+<p>Fragments are around 300 nucleotides. Don’t know which mRNA strand is original or compliment. Can label original strand. Can check by mapping strands to genome. B on slide 6 is indicative of stranded protocol.</p>
+<p>Hiseq illumina: 100-200 nucleotides.</p>
+<p>Record phred score to letter, adding 33 t ophred as first 33 ascii characters are invisible. Captitals are therefore showing better quality reads;</p>
+<div id="alignment-based-approach-count-reads-per-gene." class="section level3">
+<h3>Alignment based approach: Count reads per gene.</h3>
+<p>Align reads to genes.recall reads are from transcripts (don’t know if splice etc was there in genome). One read can align to multuple genes</p>
+<p>Split reads across introns</p>
+<p>Take all reads that overlaps an exon and sum them up.</p>
+<p>Long transripts = more reads, therefore larger sum. GC content affects number of reads</p>
+<p>Can count reads per gene or reads per exon with a gene. Can get reads per exon. Can check if same or different isoforms expressed. Is one exon missing v. present in different conditions.</p>
+<p>Get annotations from public sources.</p>
+<p>Online data: typical want primary assembly. DNA: genome. cDNA: coing DNA - transcripts.</p>
+<p>Need to know where genes are, obviously: gtf file; One row for each genomic feature. e.g. 2R = chromosome. GTF files in gene set column.</p>
+<p>Many aligners exist. For RNA seq, the alinger needs to aware of the splicer. STAR more established. HISAT2 uses less memory.</p>
+<p><strong>Step 1 - index genome</strong></p>
+<p>Compare each read to each base in the genome (3 billion base pairs for humans). Too slow, so make index of genome. Index genome once (genomeGenerate). Overhang: how far into exon do I allow read to align. Want to allow most of read to be in one exon. Usually read length minus 1. Longer = slower.</p>
+<p><strong>Step 2 - align reads</strong></p>
+<p>Output to BAM = binary SAM.</p>
+<p>Header: list of reference sequences. Usually aligner call too. Body: One line per alignment. One read can therefore appear on multiple lines, if it aligned to multiple genes.</p>
+<p>SAM flag: list of binary questions. 1 = yes. See <a href="http://broadinstitute.github.io/picard/explain-flags.html">http://broadinstitute.github.io/picard/explain-flags.html</a></p>
+<p>CIGAR string: how the read aligned in this position.</p>
+<p>e.g. starting at position 5, 3 matches (3M), one insertion (1I), 3M, one deletion (1D), 5M</p>
+<p>doesn’t tell about base mismatches, just if read aligned with reference.</p>
+<p>Do quality control with fastQC. Can filter out bad reads, but usually not done for RNA: just not aligned. Quality typically better earlier in reads.</p>
+<p><strong>Step 3 - Estimating abundances via overlap counting</strong></p>
+<p>featureCounts probably most popular</p>
+<p>Slide 33: split gene? Splicing: introns, exons. etc. not usually seen in viruses. see slide 22</p>
+<p>Count paired end data once only.</p>
+</div>
+<div id="alignment-free-approach" class="section level3">
+<h3>Alignment-free approach</h3>
+<p>Take all transcripts (e.g. cDNA), form all equivalence classes. Map reads to classes. Estimate underlying abundencies given observations, using EM.</p>
+<p>Effective length: adjusting for biases and the fact that the fragment has to start a certain number of bases from the end of the fragment. Also, high gc content can mean no reads from a segment (adjsut for this).</p>
+<p>Which transcripts correspond to which gene: tximport.</p>
+<p>2 transcripts can be isoforms of same gene.</p>
+</div>
 </div>
 </div>
 

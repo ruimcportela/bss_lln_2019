@@ -81,10 +81,13 @@ getAnywhere(anova.lm)
 ```
 ```{r}
 library(Biostrings)
+```
+```{r, eval= FALSE}
 ?`reverseComplement,DNAStringSet-class`  
 ```
+
 This structure is for S4:
-```{r}
+```{r, eval = FALSE}
 ?`reverseComplement,DNAStringSet-method`
 ```
 
@@ -254,4 +257,90 @@ goana: does the relevant joins to get the gene sets from the entrez ids.
 
 p-value histogram is very informative/ should be uniform, spikes at higher values suggest the wrong test, small slope upwards towards wero implies lower power.
 
+# Day 4
+
+## High-throughput sequencing data processing: Charlotte Sonenson
+
+mRNA code for protein, need to remove ribosome RNA.
+
+Fragments are around 300 nucleotides. Don't know which mRNA strand is original or compliment. Can label original strand. Can check by mapping strands to genome. B on slide 6 is indicative of stranded protocol. 
+
+Hiseq illumina: 100-200 nucleotides. 
+
+Record phred score to letter, adding 33 t ophred as first 33 ascii characters are invisible. Captitals are therefore showing better quality reads; 
+
+### Alignment based approach: Count reads per gene. 
+
+Align reads to genes.recall reads are from transcripts (don't know if splice etc was there in genome). One read can align to multuple genes
+
+Split reads across introns
+
+Take all reads that overlaps an exon and sum them up. 
+
+Long transripts = more reads, therefore larger sum. GC content affects number of reads
+
+Can count reads per gene or reads per exon with a gene. Can get reads per exon. Can check if same or different isoforms expressed. Is one exon missing v. present in different conditions. 
+
+Get annotations from public sources. 
+
+
+
+Online data: typical want primary assembly. DNA: genome. cDNA: coing DNA - transcripts.
+
+Need to know where genes are, obviously: gtf file; One row for each genomic feature. e.g. 2R = chromosome. GTF files in gene set column. 
+
+
+Many aligners exist. For RNA seq, the alinger needs to aware of the splicer. STAR more established. HISAT2 uses less memory. 
+
+**Step 1 - index genome**
+
+Compare each read to each base in the genome (3 billion base pairs for humans). Too slow, so make index of genome. Index genome once (genomeGenerate). Overhang: how far into exon do I allow read to align. Want to allow most of read to be in one exon. Usually read length minus 1. Longer = slower. 
+
+**Step 2 - align reads**
+
+Output to BAM = binary SAM.
+
+Header: list of reference sequences. Usually aligner call too.
+Body: One line per alignment. One read can therefore appear on multiple lines, if it aligned to multiple genes. 
+
+
+SAM flag: list of binary questions. 1 = yes. See [http://broadinstitute.github.io/picard/explain-flags.html](http://broadinstitute.github.io/picard/explain-flags.html)
+
+CIGAR string: how the read aligned in this position.
+
+e.g.  starting at position 5, 3 matches (3M), one insertion (1I), 3M, one deletion (1D), 5M
+
+doesn't tell about base mismatches, just if read aligned with reference. 
+
+Do quality control with fastQC. Can filter out bad reads, but usually not done for RNA: just not aligned. Quality typically better earlier in reads. 
+
+**Step 3 - Estimating abundances via overlap counting**
+
+featureCounts probably most popular
+
+Slide 33: split gene? Splicing:  introns, exons. etc. not usually seen in viruses. see slide 22
+
+Count paired end data once only. 
+
+
+
+### Alignment-free approach
+
+Take all transcripts (e.g. cDNA), form all equivalence classes. Map reads to classes. Estimate underlying abundencies given observations, using EM. Only sees exons, not introns. 
+
+Effective length: adjusting for biases and the fact that the fragment has to start a certain number of bases from the end of the fragment. Also, high gc content can mean no reads from a segment (adjsut for this).
+
+Which transcripts correspond to which gene: tximport.
+
+2 transcripts can be isoforms of same gene. 
+
+
+c_i : numver reads, length l. 
+
+TPM: transcript per million 
+
+
+## Tutorial RNAseq
+
+iSee: visualising SummarizedExperiment data: reproducible. 
 

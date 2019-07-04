@@ -2,6 +2,10 @@
     "path" : "C:/Paul/Local_Projects/Other_Projects/Bioinformatics School/Code",
     "sortOrder" : [
         {
+            "ascending" : false,
+            "columnIndex" : 4
+        },
+        {
             "ascending" : true,
             "columnIndex" : 2
         }
