@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!-- saved from url=(0090)https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#1-cptac-a-vs-b-dataset-lab-3 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Differential expression analysis</title>
+    <link type="text/css" rel="stylesheet" href="./Differential expression analysis_files/bootstrap.css">
+    <link type="text/css" rel="stylesheet" href="./Differential expression analysis_files/bootstrap-responsive.css">
+    <link type="text/css" rel="stylesheet" href="./Differential expression analysis_files/pilcrow.css">
+    <link type="text/css" rel="stylesheet" href="./Differential expression analysis_files/hljs-github.min.css">
+    <link type="text/css" rel="stylesheet" href="./Differential expression analysis_files/style.css">
+  </head>
+<body>
+
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span3"><ul class="nav nav-list">
+    <li class="sidebar-header-3"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#1-cptac-a-vs-b-dataset-lab-3">1 CPTAC A vs B dataset lab 3</a></li>
+    <li class="sidebar-header-5"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#1.1.-evaluate-median-summarization">1.1. Evaluate Median Summarization</a></li>
+    <li class="sidebar-header-5"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#1.2.-evaluate-robust-summarization">1.2. Evaluate robust Summarization</a></li>
+    <li class="sidebar-header-4"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#2.-breast-cancer-example">2. Breast cancer example</a></li>
+    <li class="sidebar-header-5"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#2.1-perform-an-msqrob-analysis-for-peptide-file-3x3.">2.1 Perform an MSqRob analysis for peptide file 3x3.</a></li>
+    <li class="sidebar-header-6"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#section-1.-data">Section 1. Data</a></li>
+    <li class="sidebar-header-6"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#section-2.-preprocessing">Section 2. preprocessing</a></li>
+    <li class="sidebar-header-6"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#section-3.1.-inference">Section 3.1. Inference</a></li>
+    <li class="sidebar-header-5"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#2.2.-perform-an-msqrob-analysis-for-peptide-file-6x6.">2.2. Perform an MSqRob analysis for peptide file 6x6.</a></li>
+    <li class="sidebar-header-5"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#3.-blocking:-mouse-t-cell-example">3. Blocking: Mouse T-cell example</a></li>
+    <li class="sidebar-header-5"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#3.1-how-would-you-analyse-the-crd-data?">3.1 How would you analyse the CRD data?</a></li>
+    <li class="sidebar-header-5"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#3.2.-how-would-you-analyse-the-rcb-data?">3.2. How would you analyse the RCB data?</a></li>
+    <li class="sidebar-header-5"><a href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#3.3.-try-to-explain-the-difference-in-the-number-of-proteins-that-can-be-discovered-with-both-designs?">3.3. Try to explain the difference in the number of proteins that can be discovered with both designs?</a></li>
+</ul>
+      </div>
+      <div class="span9 main"><p>The result of a quantitative analysis is a list of peptide and/or protein abundances for every protein in different samples, or abundance ratios between the samples. In this tutorial we will describe a generic workflow for differential analysis of quantitative datasets with simple experimental designs.</p>
+<h3 id="1-cptac-a-vs-b-dataset-lab-3"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#1-cptac-a-vs-b-dataset-lab-3"></a>1 CPTAC A vs B dataset lab 3</h3>
+<p>Our first case-study is a subset of the data of the 6th study of the Clinical Proteomic Technology Assessment for Cancer (CPTAC). In this experiment, the authors spiked the Sigma Universal Protein Standard mixture 1 (UPS1) containing 48 different human proteins in a protein background of 60 ng/μL Saccharomyces cerevisiae strain BY4741 (MATa, leu2Δ0, met15Δ0, ura3Δ0, his3Δ1). Two different spike-in concentrations were used: 6A (0.25 fmol UPS1 proteins/μL) and 6B (0.74 fmol UPS1 proteins/μL) [5]. We limited ourselves to the data of LTQ-Orbitrap W at site 56. The data were searched with MaxQuant version 1.5.2.8, and detailed search settings were described in Goeminne et al. (2016) [1]. Three replicates are available for each concentration.</p>
+<p>The study is a spike-in study for which we know the ground truth so we have the ability to evaluate the quality of the fold change estimates and the list of DE genes that we return with a method.</p>
+<h5 id="1.1.-evaluate-median-summarization"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#1.1.-evaluate-median-summarization"></a>1.1. Evaluate Median Summarization</h5>
+<p>We first assess the quality of the fold change estimates for the median summarization.</p>
+<p>An rmarkdown notebook for the analysis can be downloaded here: <a href="https://raw.githubusercontent.com/UCLouvain-CBIO/BSS2019/master/docs/figs/cptacAvsB_lab3_median.Rmd?token=AAC5ZRVFL5KJUL7EKBTJS325FBA76">cptacAvsB_lab3_median.Rmd</a> and <a href="https://uclouvain-cbio.github.io/BSS2019/figs/cptacAvsB_lab3_median.html">cptacAvsB_lab3_median.html</a>.</p>
+<h5 id="1.2.-evaluate-robust-summarization"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#1.2.-evaluate-robust-summarization"></a>1.2. Evaluate robust Summarization</h5>
+<p>Save the script as cptac_lab3_robust.Rmd  and alter the script so to summarize the results using robust summarization, i.e. replace the argument <code>method="median"</code> in the <code>combineFeatures</code> function to <code>method=robust</code>.</p>
+<pre class="hljs"><code><span class="hljs-function"><span class="hljs-title">combineFeatures</span><span class="hljs-params">(pepData, fcol = <span class="hljs-string">"Proteins"</span>, method = <span class="hljs-string">"robust"</span>)</span></span></code></pre><h4 id="2.-breast-cancer-example"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#2.-breast-cancer-example"></a>2. Breast cancer example</h4>
+<p>Eighteen Estrogen Receptor Positive Breast cancer tissues from from patients treated with tamoxifen upon recurrence have been assessed in a proteomics study. Nine patients had a good outcome (or) and the other nine had a poor outcome (pd).
+The proteomes have been assessed using an LTQ-Orbitrap  and the thermo output .RAW files were searched with MaxQuant (version 1.4.1.2) against the human proteome database (FASTA version 2012-09, human canonical proteome).</p>
+<p>Three peptides txt files are available:</p>
+<ol class="list">
+<li>For a 3 vs 3 comparison</li>
+<li>For a 6 vs 6 comparison</li>
+<li>For a 9 vs 9 comparison</li>
+</ol>
+<h5 id="2.1-perform-an-msqrob-analysis-for-peptide-file-3x3."><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#2.1-perform-an-msqrob-analysis-for-peptide-file-3x3."></a>2.1 Perform an MSqRob analysis for peptide file 3x3.</h5>
+<p>Adjust the Rmarkdown file.</p>
+<ol class="list">
+<li>Start from the cptacAvsB_lab3_robust.Rmd file.</li>
+<li>Save the file as cancer_3x3.Rmd</li>
+</ol>
+<h6 id="section-1.-data"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#section-1.-data"></a>Section 1. Data</h6>
+<ol class="list">
+<li>Replace the background section with the information from Section 2.2. here above.</li>
+<li>Delete section 3.3.3. boxplot and 3.3.4. Sensitivity FDP plot. We no longer have a spike-in study where we know the ground truth</li>
+<li>Comment the peptides and proteinGroups lines for the cptac data in Section 1. Data and uncomment the lines for the peptides and proteinGroups file for the cancer Example</li>
+<li>Shorten the file names. Now the column names start with <code>Intensity.</code> use this string as the <code>pattern</code> argument for the <code>str_replace</code> function used in Section 1. Data.</li>
+<li>Check with the appropriate column names with <code>selectFeatureData(pepData)</code> function and alter the <code>fcol</code> accordingly in Section 1. Data.</li>
+<li>Explore the sample names and determine which letters in the sample names contain the information to create the factor for the condition. Alter the <code>substr(1,1)</code> statement at the end of Section 1. Data accordingly.</li>
+<li>Run each of the chunks from the Section 1. Data to check if your changes are coded correctly.</li>
+</ol>
+<h6 id="section-2.-preprocessing"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#section-2.-preprocessing"></a>Section 2. preprocessing</h6>
+<p>Change the names of the filter variables according to the names you have selected in the selectFeatureData.</p>
+<h6 id="section-3.1.-inference"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#section-3.1.-inference"></a>Section 3.1. Inference</h6>
+<p>We have to alter the <code>makeContrast</code> statement, because the  factor condition now have different names for each of the levels.</p>
+<h5 id="2.2.-perform-an-msqrob-analysis-for-peptide-file-6x6."><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#2.2.-perform-an-msqrob-analysis-for-peptide-file-6x6."></a>2.2. Perform an MSqRob analysis for peptide file 6x6.</h5>
+<ol class="list">
+<li>Start from the cancer_3x3.Rmd file you have altered in the previous section.</li>
+<li>Save the file as cancer_3x3.Rmd</li>
+<li>Comment the peptides and proteinGroups lines for the cptac data in Section 1. Data and uncomment the lines for the peptides and proteinGroups file for the cancer Example</li>
+</ol>
+<p>What do you observe if you compare the output of the 3x3 and the 9x9 analyses, try to explain?</p>
+<h5 id="3.-blocking:-mouse-t-cell-example"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#3.-blocking:-mouse-t-cell-example"></a>3. Blocking: Mouse T-cell example</h5>
+<p>Duguet et al. 2017 compared the proteomes of mouse regulatory T cells (Treg) and conventional T cells (Tconv) in order to discover differentially regulated proteins between these two cell populations. For each biological repeat the proteomes were extracted for both Treg and Tconv cell pools, which were purified by flow cytometry. The data in data/quantification/mouseTcell on the pdaData repository are a subset of the data <a href="https://www.ebi.ac.uk/pride/archive/projects/PXD004436">PXD004436</a> on PRIDE.</p>
+<p class="img-container"><img src="./Differential expression analysis_files/mouseTcell_RCB_design.png" alt="Figure 4. Design Mouse Study"></p>
+<p>Three subsets of the data are avialable:</p>
+<ul class="list">
+<li>peptidesCRD.txt: contains data of Tconv cells for 4 bio-repeats and Treg cells for 4 bio-repeats</li>
+<li>peptidesRCB.txt: contains data for 4 bio-repeats only, but for each bio-repeat the Treg and Tconv proteome is profiled.   </li>
+<li>peptides.txt: contains data of Treg and Tconv cells for 7 bio-repeats</li>
+</ul>
+<p>Alter the cancer_3x3 script for the analysis of the Mouse T-cell example.</p>
+<h5 id="3.1-how-would-you-analyse-the-crd-data?"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#3.1-how-would-you-analyse-the-crd-data?"></a>3.1 How would you analyse the CRD data?</h5>
+<h5 id="3.2.-how-would-you-analyse-the-rcb-data?"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#3.2.-how-would-you-analyse-the-rcb-data?"></a>3.2. How would you analyse the RCB data?</h5>
+<h5 id="3.3.-try-to-explain-the-difference-in-the-number-of-proteins-that-can-be-discovered-with-both-designs?"><a class="header-link" href="https://uclouvain-cbio.github.io/BSS2019/tutorialsMsqRob.html#3.3.-try-to-explain-the-difference-in-the-number-of-proteins-that-can-be-discovered-with-both-designs?"></a>3.3. Try to explain the difference in the number of proteins that can be discovered with both designs?</h5>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="./Differential expression analysis_files/jquery.min.js.download"></script>
+  <script type="text/javascript" src="./Differential expression analysis_files/bootstrap.min.js.download"></script>
+
+
+</body></html>

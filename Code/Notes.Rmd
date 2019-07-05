@@ -403,3 +403,8 @@ M/Z: Mass over charge
 
 Choose one peptide and reanalyse: break up
 
+
+
+## 
+
+Can only use peptides that map to a single protein or group of proteins. Remove keratin: from lab techs skin! also dog hair! 
