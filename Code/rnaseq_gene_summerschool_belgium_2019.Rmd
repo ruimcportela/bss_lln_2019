@@ -673,9 +673,21 @@ to `results()`, so that the function will use an alternative threshold for the
 optimal independent filtering step:
 
 ```{r}
-res.05 <- results(ds_se, alpha = 0.05)
-table(res.05$padj < 0.05)
+res.05 <- results(ds_se, alpha = 0.5)
+table(res.05$padj < 0.5)
 ```
+```{r}
+table(res$padj < 0.1)
+```
+
+```{r}
+sum(table(res$padj < 0.1));sum(table(res.05$padj < 0.5))
+```
+
+```{r}
+res$padj %>% is.na() %>% sum() ; res.05$padj %>% is.na() %>% sum()
+```
+
 
 If we want to raise the log2 fold change threshold, so that we test for genes
 that show more substantial changes due to treatment, we simply supply a value on

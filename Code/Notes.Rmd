@@ -362,3 +362,44 @@ DEseq2: fit curve (parammetric or not); move dots towards regression line.
 
 Having the transcript abundancies allows for the average transcript length to be calculated. 
 
+
+# Day 5
+
+## Single cell RNA seq
+
+Reverse transcription very inefficient : 10-20% capturing/reverse transcription efficiency. 
+
+Gene's express in bursting patterns i.e. not always expressing. Single cell resolution over time needed (gene turning on and off).
+
+Note: cell identity represents the combined effect of cell type (permanent feature, e.g. neuron) and cell state (transient feature, e.g. cell cycle stage)
+
+gel bead contains oleagone nucleotides. droplets can contain 0,1, multiple cells/beads: stochastic. 
+
+droplet based: fewer reads per cell, only gene level resolution and not transcript level protocol. low SNR. Bursting means more zeros too. 
+
+plate based: labour intensive, but transcript level resolution. 
+
+droplet: good for discovering rate 
+
+[https://www.elveflow.com/microfluidic-tutorials/microfluidic-reviews-and-tutorials/drop-seq/](https://www.elveflow.com/microfluidic-tutorials/microfluidic-reviews-and-tutorials/drop-seq/)
+
+
+PCR handle: PCR handle is in fact a constant sequence identical on all primers and beads, which allows PCR amplification after STAMP formation.
+UMI: unique molecular identifier. assign read to trascript of origin
+barcode: assign read to cell of origin.
+
+tSNE: only locally interprebale. small distances means close expression, but large distances don't mean anything. 
+
+### zero-inflated negative binomial
+
+Detection rate is +vly correlated with first pc.  
+
+
+## Proteomics
+
+[https://en.wikipedia.org/wiki/Tandem_mass_spectrometry](https://en.wikipedia.org/wiki/Tandem_mass_spectrometry)
+
+M/Z: Mass over charge
+
+Choose one peptide and reanalyse: break up
+
