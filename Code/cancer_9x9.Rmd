@@ -1,5 +1,5 @@
 ---
-title: "Introduction to proteomics data analysis"
+title: "Breast cancer example"
 author:
   - name: Lieven Clement, Paul's working version
 output:
@@ -7,13 +7,20 @@ output:
 ---
   
   
-  # Background
-  This case-study is a subset of the data of the 6th study of the Clinical Proteomic Technology Assessment for Cancer (CPTAC).
-In this experiment, the authors spiked the Sigma Universal Protein Standard mixture 1 (UPS1) containing 48 different human proteins in a protein background of 60 ng/$\mu$L Saccharomyces cerevisiae strain BY4741.
-Two different spike-in concentrations were used: 6A (0.25 fmol UPS1 proteins/$\mu$L) and 6B (0.74 fmol UPS1 proteins/$\mu$L) [5].
-We limited ourselves to the data of LTQ-Orbitrap W at site 56.
-The data were searched with MaxQuant version 1.5.2.8, and detailed search settings were described in Goeminne et al. (2016) [1].
-Three replicates are available for each concentration.
+# Background
+
+Eighteen Estrogen Receptor Positive Breast cancer tissues from from patients treated with tamoxifen upon recurrence have been assessed in a proteomics study. Nine patients had a good outcome (or) and the other nine had a poor outcome (pd). The proteomes have been assessed using an LTQ-Orbitrap and the thermo output .RAW files were searched with MaxQuant (version 1.4.1.2) against the human proteome database (FASTA version 2012-09, human canonical proteome).
+
+Three peptides txt files are available:
+
+For a 3 vs 3 comparison
+For a 6 vs 6 comparison
+For a 9 vs 9 comparison
+2.1 Perform an MSqRob analysis for peptide file 3x3.
+Adjust the Rmarkdown file.
+
+Start from the cptacAvsB_lab3_robust.Rmd file.
+Save the file as cancer_3x3.Rmd
 
 # Data
 
@@ -30,16 +37,33 @@ library(MSqRob)
 library(MSnbase)
 library(tidyverse)
 library(limma)
-peptidesFile <- "https://raw.githubusercontent.com/statOmics/pda/data/quantification/cptacAvsB_lab3/peptides.txt"
-proteinGroupsFile <-"https://raw.githubusercontent.com/statOmics/pda/data/quantification/cptacAvsB_lab3/proteinGroups.txt"
-#peptidesFile <- "https://raw.githubusercontent.com/statOmics/pda/data/quantification/cancer/peptides3vs3.txt"
+
+# proteinGroups data
+
+#peptidesFile <- "https://raw.githubusercontent.com/statOmics/pda/data/quantification/cptacAvsB_lab3/peptides.txt"
+#proteinGroupsFile <-"https://raw.githubusercontent.com/statOmics/pda/data/quantification/cptacAvsB_lab3/proteinGroups.txt"
+
+#Cancer data
+
+#◙peptidesFile <- "https://raw.githubusercontent.com/statOmics/pda/data/quantification/cancer/peptides3vs3.txt"
 #proteinGroupsFile <-"https://raw.githubusercontent.com/statOmics/pda/data/quantification/cancer/proteinGroups.txt"
-#peptidesFile <- "https://raw.githubusercontent.com/statOmics/pda/data/quantification/cancer/peptides9vs9.txt"
-#proteinGroupsFile <-"https://raw.githubusercontent.com/statOmics/pda/data/quantification/cancer/proteinGroups.txt"
+
+
+peptidesFile <- "https://raw.githubusercontent.com/statOmics/pda/data/quantification/cancer/peptides9vs9.txt"
+proteinGroupsFile <-"https://raw.githubusercontent.com/statOmics/pda/data/quantification/cancer/proteinGroups.txt"
+
+
+
 #peptidesFile <- "https://raw.githubusercontent.com/statOmics/pda/data/quantification/mouseTcell/peptidesCRD.txt"
 #proteinGroupsFile <-"https://raw.githubusercontent.com/statOmics/pda/data/quantification/mouseTcell/proteinGroups.txt"
 #peptidesFile <- "https://raw.githubusercontent.com/statOmics/pda/data/quantification/mouseTcell/peptidesRCB.txt"
 #proteinGroupsFile <-"https://raw.githubusercontent.com/statOmics/pda/data/quantification/mouseTcell/proteinGroups.txt"
+
+
+
+# Given a text spread sheet f and a pattern to be matched to its header (first line in the file), the function returns the matching columns names or indices of the corresponding data.frame.
+
+
 ecols<-grepEcols(peptidesFile, "Intensity ", split = "\t")
 ```
 
@@ -62,18 +86,17 @@ pepData %>% exprs %>% head
 pepData %>% sampleNames
 ```
 
-The sample names are rather long and contain information on the spike-in concentration and the repeat.
-We will remove "Intensity.6" from the string
+We will remove "Intensity." from the string
 
 ```{r}
-sampleNames(pepData) <- pepData %>% sampleNames %>% str_replace(., pattern="Intensity.6", replacement="")
+sampleNames(pepData) <- pepData %>% sampleNames %>% str_replace(., pattern="Intensity.", replacement="")
 ```
 
 Next we will add information on the proteins to the feature data.
 The feature data of the object pepData contains information for each peptide in the experiment.
 This info on the proteins can be found in the proteingroups.txt file of maxquant.
 The peptides.txt file contains many data on each feature (peptide).
-We will only retain specified columns Protein, Sequence, Reverse and Potential.Contaminant, indicating the protein, peptide sequence, if the peptide is a decoy and if it is a contaminant, respectively.
+We will only retain specified columns Protein, Sequence, Reverse and Contaminant, indicating the protein, peptide sequence, if the peptide is a decoy and if it is a contaminant, respectively.
 
 In older and more recent versions of maxquant the names of the fields might vary. We can therefore explore the names we want to select with the shiny app that can be launched from the selectFeatureData from the MSnbase package, i.e. by running the function without an fcol argument that specifies the columns you would like to select.
 
@@ -86,7 +109,7 @@ pepData<-selectFeatureData(pepData)
 If we know the columns, we can specify them as a vector in the fcol slot.
 
 ```{r}
-pepData<-selectFeatureData(pepData,fcol=c("Proteins","Potential.contaminant","Reverse","Sequence"))
+pepData<-selectFeatureData(pepData,fcol=c("Proteins","Protein.names","Gene.names", "Contaminant","Reverse","Sequence"))
 ```
 
 Calculate how many non zero intensities we have per peptide. This will be useful for filtering.
@@ -162,7 +185,7 @@ We now remove the contaminants, peptides that map to decoy sequences and protein
 
 ```{r}
 pepData <- pepData[fData(pepData)$Reverse!="+",]
-pepData <- pepData[fData(pepData)$Potential.contaminant!="+",]
+pepData <- pepData[fData(pepData)$Contaminant!="+",]
 ```
 
 ### Remove peptides of proteins that were only identified with modified peptides
@@ -221,8 +244,8 @@ plotMDS(exprs(pepData),col=as.double(pData(pepData)$condition))
 ```
 
 The first axis in the plot is showing the leading log fold changes (differences on the log scale) between the samples.
-We notice that the leading differences (log FC) in the peptide data seems to be driven by technical variability.
-Indeed the samples do not seem to be clearly separated according to the spike in condition.
+
+
 Because there are missing values for the peptide level data we use the `na.rm=TRUE` argument to summarize the data based on the observed peptides for every protein.
 
 ## Summarization to protein level
@@ -246,7 +269,6 @@ We notice that the leading differences (log FC) in the protein data is still acc
 ```{r}
 plotMDS(exprs(protData),col=as.double(pData(pepData)$condition))
 ```
-Still see technical variabiltiy in x-axis, but now also a cleaner biological split. 
 
 
 # Data Analysis
@@ -279,7 +301,7 @@ In MSqRob we have opted to formulate contrasts using all levels of a factor.
 Internally, the contrasts are than recasted according to the factor level that is the reference class.
 
 ```{r}
-L <- makeContrast("conditionB - conditionA",  levels=c("conditionA","conditionB"))
+L <- makeContrast("conditionO - conditionP",  levels=c("conditionO","conditionP"))
 tests <- test.contrast_adjust(models, L)
 nSig <- sum(tests$signif,na.rm=TRUE)
 head(tests,nSig)
@@ -308,62 +330,12 @@ ggplotly(volcano)
 
 ### Heatmap
 
-We first select the names of the significant proteins.
+We first select the names of the first ten proteins.
 
 ```{r}
 sigNames<- tests %>% rownames_to_column("protein") %>% filter(signif) %>% pull(protein)
 heatmap(exprs(protData)[sigNames,])
 ```
 
-### Detail plot for the top 5 proteins.
 
-We first extract the normalized protein expression values for a particular protein and we create a dataframe that contains the protein expression values and the relevant variables of the experimental design.  
 
-```{r, warning=FALSE, message=FALSE}
-for (protName in rownames(tests)[1:5])
-{
-plotDat<-pepData[fData(pepData)$Proteins==protName] %>% exprs
-plotDataStack<-data.frame(quant_value=c(plotDat),sequence=rep(rownames(plotDat),rep=ncol(plotDat)),sample=rep(colnames(plotDat),each=nrow(plotDat)),condition=rep(pData(pepData)$condition,each=nrow(plotDat)))
-plot1 <- ggplot(plotDataStack, aes(x=sample, y=quant_value,fill=condition))
-print(plot1 +geom_boxplot(outlier.shape=NA) + geom_point(position=position_jitter(width=.1),aes(shape=sequence)) + scale_shape_manual(values=1:nrow(plotDat)) +labs(title = protName, x="sample", y="Peptide intensity (log2)"))
-}
-```
-
-### Boxplot of fold changes
-
-Because we know the ground truth for the cptac study, i.e. we know that only the spike-in proteins (UPS) are differentially expressed, we can evalute the fold changes.
-Yeast proteins should be not differentially expressed and their log fold changes should be centered around 0. These of UPS proteins are spiked at differt concentrations and their log2 fold changes should be centered around log2(concB/concA)=log2(0.74/0.25)=`r log2(0.74/0.25)`.
-
-We will first create a novel factor in the results table that is called `spike` to indicate which proteins are spiked.
-
-```{r,warning=FALSE}
-tests$spike <- tests %>% rownames %>% grepl(.,pattern="UPS")
-ggplot(tests, aes(x=spike, y=estimate)) +
-  geom_boxplot() +
-  geom_hline(yintercept=c(0,log(0.74/0.25,base=2)),color="red")+
-  ylab("log2 FC")
-```
-
-### Sensitivity FDP plot
-
-Because we know the ground truth for the cptac study, i.e. we know that only the spike-in proteins (UPS) are differentially expressed, we can calculate
-
-- the sensitivity or true positive rate (TPR), the proportion of actual positives that are correctly identified, in the protein list that we return
-$$TPR=\frac{TP}{\text{#actual positives}},$$
-here TP are the true positives in the list. The TPR is thus the fraction of ups proteins that we can recall.
-
-- false discovery proportion (FPD): fraction of false positives in the protein list that we return:
-$$FPD=\frac{FP}{FP+TP},$$
-with FP the false positives. In our case the yeast proteins that are in our list.
-
-Instead of only calculating that for the protein list that is returned for the chosen FDR level, we can do this for all possible FDR cutoffs so that we get an overview of the quality of the ranking of the proteins in the protein list.
-
-```{r}
-tests<-tests %>% rownames_to_column("protein") %>%
-mutate(
-FDP=cumsum(!spike)/(1:length(spike)),
-TPR=cumsum(spike)/sum(spike)) %>%
-column_to_rownames("protein")
-
-ggplot(tests,aes(x=FDP,y=TPR)) + geom_path() +geom_vline(xintercept=0.05,lty=2) + geom_point(data=tests[sum(tests$signif,na.rm=TRUE),],aes(x=FDP,y=TPR),cex=2)
-```

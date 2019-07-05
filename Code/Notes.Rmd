@@ -405,6 +405,11 @@ Choose one peptide and reanalyse: break up
 
 
 
-## 
+## Introduction to proteomics data analysis
 
 Can only use peptides that map to a single protein or group of proteins. Remove keratin: from lab techs skin! also dog hair! 
+
+Ordinary t-test: lots of proteins classified as expressed with low fold change. 
+
+
+use rm() and gc() garbage collection. 
